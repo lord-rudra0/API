@@ -16,30 +16,110 @@ app.get("/random",(req,res)=>
 })
 //2. GET a specific joke
 
-app.get("/joke:/id",(req,res)=>
+app.get("/jokes/:id",(req,res)=>
 {
   const id=parseInt(req.params.id);
-  const joke_ = jokes.find((joke)=>joke.id==id);
+  const joke_ = jokes.find((joke)=>joke.id===id);
   res.json(joke_);
 })
 
 //3. GET a jokes by filtering on the joke type
 
-app.get("/jokes/:types",(req,res)=>
+app.get("/types",(req,res)=>
 {
-  const jokes_types=parseInt(res.body.jokeType);
-
+  const types=req.query.type;
+  const joke=jokes.filter((joke)=>joke.jokeType==types);
+  res.json(joke);
 })
 
 //4. POST a new joke
 
+app.post("/jokes",(req,res)=>
+{
+  const joke={
+    id:jokes.length+1,
+    jokeText:req.body.text,
+    jokeType:req.body.type,
+  };
+
+  jokes.push(joke);jokes/5
+  console.log(jokes.slice(-1));
+  res.json(joke);
+
+})
+
 //5. PUT a joke
+
+app.put("/jokes/:id",(req,res)=>
+{
+  const id=parseInt(req.params.id);
+  const user_data={
+    id:id,
+    jokeText:req.body.text,
+    jokeType:req.body.type
+  };
+
+  const id_index=jokes.findIndex((joke)=>joke.id===id);
+  jokes[id_index]=user_data;
+  console.log(id_index)
+  res.json(user_data)
+
+
+});
 
 //6. PATCH a joke
 
+app.patch("/jokes/:id",(req,res)=>
+{
+  const id=parseInt(req.params.id);
+  const current_joke=jokes.find((joke)=>joke.id=id);
+  const replacementJoke={
+    id:id,
+    jokeText:req.body.text || current_joke.jokeText,
+    jokeType:req.body.type || current_joke.jokeType
+  }
+  const id_index=jokes.findIndex((joke)=>joke.id===id);
+  jokes[id_index]=replacementJoke;
+  console.log(id_index)
+  res.json(user_data)
+})
+
 //7. DELETE Specific joke
 
+
+app.delete("/jokes/:id",(req,res)=>
+{
+  const id=parseInt(req.params.id);
+  const find_joke=jokes.findIndex((joke)=>joke.id===id);
+  if (find_joke>-1)
+  {
+    jokes.splice(find_joke,1);
+    res.sendStatus(200)
+  }
+  else
+  {
+    res.sendStatus(404);
+    res.json(`${id} not found`)
+  }
+
+  console.log(find_joke);
+})
+
 //8. DELETE All jokes
+
+app.delete("/all",(req,res)=>
+{
+  const key=req.query.key;
+  if(key===masterKey)
+  {
+    jokes.splice(0,jokes.length);
+    res.sendStatus(200);
+  }
+  else{
+    res.sendStatus(404);
+    res.json("invalid key")
+  }
+})
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
