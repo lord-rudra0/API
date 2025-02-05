@@ -1,9 +1,12 @@
 # .log
 *.log
+
 # .env
 .env
+
 # .sqlite
 *.sqlite
+
 # .DS_Store
 .DS_Store
 
